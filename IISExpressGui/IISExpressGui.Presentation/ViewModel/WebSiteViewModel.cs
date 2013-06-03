@@ -77,6 +77,22 @@ namespace IISExpressGui.Presentation.ViewModel
             }
         }
 
+        public string Port
+        {
+            get { return this.webSite.Port; }
+            set
+            {
+                if (value == this.webSite.Port)
+                {
+                    return;
+                }
+
+                this.webSite.Port = value;
+                IsModified = true;
+                base.OnPropertyChanged("Port");
+            }
+        }
+
         public string PhysicalPath
         {
             get { return this.webSite.PhysicalPath; }
@@ -204,7 +220,9 @@ namespace IISExpressGui.Presentation.ViewModel
         {
             var webSite = new WebSite 
                               {
-                                  Name = "New WebSite" ,
+                                  Name = "New WebSite",
+                                  Url = "http://localhost",
+                                  Port = "8080",
                                   IsRunning = false
                               };
             return new WebSiteViewModel(webSite, webSiteManager, mediator) 

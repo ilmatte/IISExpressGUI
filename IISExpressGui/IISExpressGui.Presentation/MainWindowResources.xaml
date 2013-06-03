@@ -177,22 +177,32 @@
             <TextBox x:Name="nameTextBox" Grid.Row="0" Grid.Column="1" 
                      Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" 
                      HorizontalAlignment="Left" 
+                     VerticalAlignment="Center"
                      Width="200"/>
-            <Label Grid.Row="2" Grid.Column="0" 
+            <Label x:Name="urlLabel" Grid.Row="2" Grid.Column="0" 
                    Content="_Url:" 
                    HorizontalAlignment="Right"
-                   Target="urlTextBox"/>
-            <TextBox x:Name="urlTextBox" Grid.Row="2" Grid.Column="1" 
-                     Text="{Binding Path=Url}" 
-                     HorizontalAlignment="Left" 
-                     Width="200"/>
+                   Target="portTextBox"/>
+            <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1">
+                <TextBlock VerticalAlignment="Center"
+                           Text="{Binding Path=Url}" />
+                <TextBlock VerticalAlignment="Center"
+                           Text=":" />
+                <TextBox x:Name="portTextBox" 
+                         Margin="3,0,0,0"
+                         Text="{Binding Path=Port}" 
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Left" 
+                         />
+            </StackPanel>
             <Label Grid.Row="4" Grid.Column="0" 
                    Content="_Path:" 
                    HorizontalAlignment="Right"
                    Target="pathTextBox"/>
             <TextBox x:Name="pathTextBox" Grid.Row="4" Grid.Column="1" 
                      Text="{Binding Path=PhysicalPath}" 
-                     HorizontalAlignment="Left" 
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Center"
                      Width="200"/>
             <Button 
                   Grid.Row="6" Grid.Column="2"

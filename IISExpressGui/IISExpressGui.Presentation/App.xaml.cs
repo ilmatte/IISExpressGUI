@@ -22,6 +22,10 @@ namespace IISExpressGui.Presentation
             base.OnStartup(e);
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
+            // TODO: add browse button
+            // TODO: modify url with link and edit button to change it to http label + 2 textboxes
+            // TODO: add IDataErrorInfo to websiteviewmodel
+
             // TODO: check applicationhost.config existence
             // TODO: if not found launch iisexpress to configure default website
             var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
