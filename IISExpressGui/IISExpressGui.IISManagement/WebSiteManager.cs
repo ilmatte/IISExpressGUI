@@ -38,6 +38,7 @@ namespace IISExpressGui.IISManagement
                 var bindingNode = site.SelectSingleNode("descendant::binding");
                 string protocol;
                 string url = null;
+                string port = null;
                 if (bindingNode != null)
                 {
                     protocol = (bindingNode.Attributes["protocol"] != null) ? bindingNode.Attributes["protocol"].Value : string.Empty;
@@ -52,8 +53,9 @@ namespace IISExpressGui.IISManagement
                         {
                             throw new Exception("invalid binding" + bindingInfo);
                         }
-                        var format = "{0}://{1}:{2}";
-                        url = string.Format(format, protocol, match.Groups["address"], match.Groups["port"]);
+                        var format = "{0}://{1}";
+                        url = string.Format(format, protocol, match.Groups["address"].Value);
+                        port = match.Groups["port"].Value;
                     }
                 }
 
@@ -62,7 +64,8 @@ namespace IISExpressGui.IISManagement
                     Id = Convert.ToInt64(site.Attributes["id"].Value),
                     Name = site.Attributes["name"].Value,
                     PhysicalPath = (physicalPathNode == null) ? string.Empty : physicalPathNode.Value,
-                    Url = url
+                    Url = url,
+                    Port = port
                 };
                 webSites.Add(webSite);
             }
@@ -100,13 +103,7 @@ namespace IISExpressGui.IISManagement
             var newBindingsNode = this.applicationHostConfig.CreateElement("bindings");
             var newBindingNode = this.applicationHostConfig.CreateElement("binding");
             newBindingNode.SetAttribute("protocol", "http");
-            var regex = new Regex(@"^http://(?<address>.+):(?<port>\d+)$");
-            var match = regex.Match(webSite.Url);
-            if (match.Groups.Count != 3)
-            {
-                throw new Exception("invalid url" + webSite.Url);
-            }
-            newBindingNode.SetAttribute("bindingInformation", string.Format(":{0}:{1}", match.Groups["port"], match.Groups["address"]));
+            newBindingNode.SetAttribute("bindingInformation", string.Format(":{0}:localhost", webSite.Port));
             newBindingsNode.AppendChild(newBindingNode);
             newSiteNode.AppendChild(newBindingsNode);
 
@@ -132,13 +129,7 @@ namespace IISExpressGui.IISManagement
             var virtualDirectoryNode = siteNode.SelectSingleNode("descendant::virtualDirectory");
             virtualDirectoryNode.Attributes["physicalPath"].Value = webSite.PhysicalPath;
             var bindingNode = siteNode.SelectSingleNode("descendant::binding");
-            var regex = new Regex(@"^http://(?<address>.+):(?<port>\d+)$");
-            var match = regex.Match(webSite.Url);
-            if (match.Groups.Count != 3)
-            {
-                throw new Exception("invalid url" + webSite.Url);
-            }
-            bindingNode.Attributes["bindingInformation"].Value = string.Format(":{0}:{1}", match.Groups["port"], match.Groups["address"]);
+            bindingNode.Attributes["bindingInformation"].Value = string.Format(":{0}:localhost", webSite.Port);
             this.applicationHostConfig.Save(this.applicationHostConfigPath);
         }
 
@@ -154,7 +145,6 @@ namespace IISExpressGui.IISManagement
                 var programFilesFolder = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
                 var startInfo = new ProcessStartInfo
                 {
-                    // TODO: da qui debug on xp to see why file not found
                     FileName = Path.Combine(programFilesFolder, @"IIS Express\IISExpress.exe"),
                     Arguments = string.Format("/site:{0}", webSite.Name),
                     RedirectStandardError = true,
