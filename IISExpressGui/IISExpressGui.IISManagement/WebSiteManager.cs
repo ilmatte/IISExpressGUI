@@ -14,6 +14,7 @@ namespace IISExpressGui.IISManagement
 {
     public class WebSiteManager : IWebSiteManager
     {
+        string iisDefaultPath;
         string applicationHostConfigPath;
         XmlDocument applicationHostConfig = new XmlDocument();
         Dictionary<long, Process> runningProcesses = new Dictionary<long, Process>();
@@ -25,7 +26,19 @@ namespace IISExpressGui.IISManagement
                 throw new ArgumentNullException("applicationHostConfigPath");
             }
             this.applicationHostConfigPath = applicationHostConfigPath;
-            this.applicationHostConfig.Load(applicationHostConfigPath);
+            this.applicationHostConfig.Load(applicationHostConfigPath);            
+            string programFilesFolder = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            this.iisDefaultPath = Path.Combine(programFilesFolder, @"IIS Express\IISExpress.exe");
+        }
+
+        public string IISDefaultPath
+        {
+            get { return this.iisDefaultPath; }
+        }
+
+        public bool IsIISExpressInstalled()
+        {            
+            return File.Exists(this.iisDefaultPath);
         }
 
         public IList<WebSite> GetAllWebSites()

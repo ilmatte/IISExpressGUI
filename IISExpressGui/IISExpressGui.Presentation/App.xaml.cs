@@ -33,6 +33,16 @@ namespace IISExpressGui.Presentation
             var path = Path.GetFullPath(applicationHostConfig);
             var webSiteManager = new WebSiteManager(path);
 
+            if (!webSiteManager.IsIISExpressInstalled())
+            {
+                MessageBoxButton buttons = MessageBoxButton.OK;
+                MessageBoxImage icon = MessageBoxImage.Error;
+                var message = string.Format("IISExpress is not installed in the following path:\r\n\r\n{0}\r\n\r\nThe application cannot Start.",
+                                            webSiteManager.IISDefaultPath);
+                MessageBox.Show(message, "Application ShutDown", buttons, icon);
+                Application.Current.Shutdown();
+            }
+
             // Create the ViewModel to which the main window binds.
             var viewModel = new MainWindowViewModel(webSiteManager);
             MainWindow window = new MainWindow();
