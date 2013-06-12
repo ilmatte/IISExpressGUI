@@ -5,13 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 using IISExpressGui.IISManagement.Interfaces;
+using System.ComponentModel;
+using System.IO;
 
 namespace IISExpressGui.Presentation.ViewModel
 {
     /// <summary>
     /// A UI-friendly wrapper for a WebSite object.
     /// </summary>
-    public class WebSiteViewModel : WorkspaceViewModel
+    public class WebSiteViewModel : WorkspaceViewModel, IDataErrorInfo
     {
         #region Fields
 
@@ -285,6 +287,37 @@ namespace IISExpressGui.Presentation.ViewModel
         bool CanToggleStatus
         {
             get { return !IsNewWebSite; }
+        }
+
+        #endregion
+
+        #region IDataErrorInfo Members
+
+        string IDataErrorInfo.Error
+        {
+            get { return (this.webSite as IDataErrorInfo).Error; }
+        }
+
+        string IDataErrorInfo.this[string propertyName]
+        {
+            get
+            {
+                string error = null;
+                if (propertyName == "PhysicalPath")
+                {
+                    // The IsCompany property of the Customer class 
+                    // is Boolean, so it has no concept of being in
+                    // an "unselected" state.  The CustomerViewModel
+                    // class handles this mapping and validation.
+                    error = !Directory.Exists(PhysicalPath) ? "Not a Valid Path" : null;
+                }
+
+                // Dirty the commands registered with CommandManager,
+                // such as our Save command, so that they are queried
+                // to see if they can execute now.
+                CommandManager.InvalidateRequerySuggested();
+                return error;
+            }
         }
 
         #endregion
