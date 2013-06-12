@@ -3,7 +3,7 @@
                     xmlns:vm="clr-namespace:IISExpressGui.Presentation.ViewModel"
                     xmlns:vw="clr-namespace:IISExpressGui.Presentation.View">
 
-    
+
 
     <!-- 
     This template applies a WebSiteView to an instance  
@@ -153,6 +153,19 @@
     </DataTemplate>
 
     <!--
+    This template is for validation error messages
+    -->
+    <DataTemplate DataType="{x:Type ValidationError}">
+        <TextBlock 
+          FontStyle="Italic"
+          Foreground="Red"
+          HorizontalAlignment="Right"
+          Margin="0,1"
+          Text="{Binding Path=ErrorContent}" 
+          />
+    </DataTemplate>
+
+    <!--
     This template explains how to render the 'Configuration' content area in the main window.
     -->
     <DataTemplate x:Key="WebSiteDetailTemplate">
@@ -200,10 +213,13 @@
                    HorizontalAlignment="Right"
                    Target="pathTextBox"/>
             <TextBox x:Name="pathTextBox" Grid.Row="4" Grid.Column="1" 
-                     Text="{Binding Path=PhysicalPath}" 
+                     Text="{Binding Path=PhysicalPath, ValidatesOnDataErrors=True}" 
                      HorizontalAlignment="Left"
                      VerticalAlignment="Center"
                      Width="200"/>
+            <ContentPresenter Grid.Row="5" Grid.Column="1"
+                      Content="{Binding ElementName=pathTextBox, Path=(Validation.Errors).CurrentItem}"
+                      />
             <Button 
                   Grid.Row="6" Grid.Column="2"
                   Command="{Binding Path=SaveCommand}"
@@ -215,5 +231,5 @@
                   />
         </Grid>
     </DataTemplate>
-    
+
 </ResourceDictionary>
