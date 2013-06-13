@@ -7,6 +7,7 @@ using System.Windows.Input;
 using IISExpressGui.IISManagement.Interfaces;
 using System.ComponentModel;
 using System.IO;
+using Ookii.Dialogs.Wpf;
 
 namespace IISExpressGui.Presentation.ViewModel
 {
@@ -25,6 +26,7 @@ namespace IISExpressGui.Presentation.ViewModel
         bool isModified;
         RelayCommand saveCommand;
         RelayCommand toggleStatusCommand;
+        RelayCommand browseCommand;
 
         #endregion
 
@@ -97,15 +99,16 @@ namespace IISExpressGui.Presentation.ViewModel
 
         public string PhysicalPath
         {
-            get { return this.webSite.PhysicalPath; }
+            get { return this.webSiteManager.GetActualPhysicalPath(this.webSite); }
             set
             {
-                if (value == this.webSite.PhysicalPath)
+                if (value == this.webSite.PhysicalPath ||
+                    value == this.webSiteManager.GetActualPhysicalPath(this.webSite))
                 {
                     return;
                 }
 
-                this.webSite.PhysicalPath = value;
+                this.webSite.PhysicalPath = this.webSiteManager.GetEscapedPhysicalPath(value);
                 IsModified = true;
                 base.OnPropertyChanged("PhysicalPath");
             }
@@ -214,6 +217,21 @@ namespace IISExpressGui.Presentation.ViewModel
             }
         }
 
+        /// <summary>
+        /// Returns a command that opens a dialog to browse folders.
+        /// </summary>
+        public ICommand BrowseCommand
+        {
+            get
+            {
+                if (this.browseCommand == null)
+                {
+                    this.browseCommand = new RelayCommand(param => this.Browse(), param => this.CanBrowse);
+                }
+                return this.browseCommand;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -234,6 +252,34 @@ namespace IISExpressGui.Presentation.ViewModel
             };
         }
 
+        /// <summary>
+        /// Opens Browse Folder Dialog.  This method is invoked by the BrowseCommand.
+        /// </summary>
+        public void Browse()
+        {
+            var browseFolderDialog = new VistaFolderBrowserDialog 
+            {
+                    ShowNewFolderButton = true
+            };
+            if (Directory.Exists(PhysicalPath))
+            {
+                browseFolderDialog.SelectedPath = PhysicalPath;
+            }
+            if (browseFolderDialog.ShowDialog() == true &&
+                !string.IsNullOrWhiteSpace(browseFolderDialog.SelectedPath))
+            {
+                PhysicalPath = browseFolderDialog.SelectedPath;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the BrowseCommand can be run.
+        /// </summary>
+        bool CanBrowse
+        {
+            get { return true; }
+        }
+        
         /// <summary>
         /// Inserts or updates the website to the repository.  This method is invoked by the SaveCommand.
         /// </summary>
@@ -262,6 +308,7 @@ namespace IISExpressGui.Presentation.ViewModel
         /// </summary>
         bool CanSave
         {
+            // TODO: FROM HERE ismodified && isvalid
             get { return IsModified; }
         }
 
@@ -302,6 +349,7 @@ namespace IISExpressGui.Presentation.ViewModel
         {
             get
             {
+                // TODO: add validation to warn if there's no web site in the folder
                 string error = null;
                 if (propertyName == "PhysicalPath")
                 {

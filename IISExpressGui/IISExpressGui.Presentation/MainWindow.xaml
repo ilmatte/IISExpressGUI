@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         MinWidth="600" MinHeight="400"
         Title="{Binding Path=DisplayName}"
-        Width="600" Height="400" 
+        Width="700" Height="500" 
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <ResourceDictionary Source="MainWindowResources.xaml" />

@@ -3,16 +3,6 @@
                     xmlns:vm="clr-namespace:IISExpressGui.Presentation.ViewModel"
                     xmlns:vw="clr-namespace:IISExpressGui.Presentation.View">
 
-
-
-    <!-- 
-    This template applies a WebSiteView to an instance  
-    of the WebSiteViewModel class shown in the main window.
-    -->
-    <DataTemplate DataType="{x:Type vm:WebSiteViewModel}">
-        <vw:WebSiteView />
-    </DataTemplate>
-
     <!-- 
     This style configures both of the main content areas in the main window.
     -->
@@ -159,7 +149,7 @@
         <TextBlock 
           FontStyle="Italic"
           Foreground="Red"
-          HorizontalAlignment="Right"
+          HorizontalAlignment="Stretch"
           Margin="0,1"
           Text="{Binding Path=ErrorContent}" 
           />
@@ -181,7 +171,7 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" MinWidth="100"/>
-                <ColumnDefinition MaxWidth="200"/>
+                <ColumnDefinition MaxWidth="325"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Row="0" Grid.Column="0" 
                    HorizontalAlignment="Right"
@@ -212,11 +202,19 @@
                    Content="_Path:" 
                    HorizontalAlignment="Right"
                    Target="pathTextBox"/>
-            <TextBox x:Name="pathTextBox" Grid.Row="4" Grid.Column="1" 
+            <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
+                <TextBox x:Name="pathTextBox" 
                      Text="{Binding Path=PhysicalPath, ValidatesOnDataErrors=True}" 
                      HorizontalAlignment="Left"
                      VerticalAlignment="Center"
-                     Width="200"/>
+                     Width="250"/>
+                <Button Content="_Browse" 
+                        Command="{Binding Path=BrowseCommand}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Margin="4,2"
+                        MinWidth="60" />
+            </StackPanel>
             <ContentPresenter Grid.Row="5" Grid.Column="1"
                       Content="{Binding ElementName=pathTextBox, Path=(Validation.Errors).CurrentItem}"
                       />
@@ -226,7 +224,7 @@
                   Content="_Save"
                   HorizontalAlignment="Right"
                   VerticalAlignment="Top"
-                  Margin="4,2" 
+                  Margin="4,2,10,2" 
                   MinWidth="60" 
                   />
         </Grid>

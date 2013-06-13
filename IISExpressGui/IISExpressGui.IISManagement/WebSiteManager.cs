@@ -186,5 +186,24 @@ namespace IISExpressGui.IISManagement
                 process.Kill();
             }        
         }
+
+        public string GetActualPhysicalPath(WebSite webSite)
+        {
+            if (webSite.PhysicalPath == null)
+            {
+                return string.Empty;
+            }
+
+            var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var iisSitesHome = Path.Combine(documentsFolder, @"My Web Sites");
+            return webSite.PhysicalPath.Replace("%IIS_SITES_HOME%", iisSitesHome);
+        }
+        
+        public string GetEscapedPhysicalPath(string inputPhysicalPath)
+        {
+            var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var iisSitesHome = Path.Combine(documentsFolder, @"My Web Sites");
+            return inputPhysicalPath.Replace(iisSitesHome, "%IIS_SITES_HOME%");
+        }
     }
 }
