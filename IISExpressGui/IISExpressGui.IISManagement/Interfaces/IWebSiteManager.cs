@@ -15,5 +15,9 @@ namespace IISExpressGui.IISManagement.Interfaces
         void Update(WebSite webSite);
 
         void ToggleStatus(WebSite webSite);
+
+        string GetActualPhysicalPath(WebSite webSite);
+
+        string GetEscapedPhysicalPath(string inputPhysicalPath);
     }
 }
