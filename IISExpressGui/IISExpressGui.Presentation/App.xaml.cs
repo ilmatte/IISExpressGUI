@@ -24,11 +24,12 @@ namespace IISExpressGui.Presentation
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
             // TODO: modify url with link and edit button to change it to http label + 2 textboxes
-            // TODO: filesystemwatch su applicationhost.config per cambiamenti e ricaricare lista siti
-            // TODO: check applicationhost.config existence
-            // TODO: if not found launch iisexpress to configure default website
-            var webSiteManager = new WebSiteManager(IISExpress.ApplicationHostConfigDefaultPath);
+            // TODO: filesystemwatch su applicationhost.config to monitor changes and reload sites list
+            // TODO: check which sites are running at startup
+            var appHostPath = IISExpress.ApplicationHostConfigDefaultPath;
+            var webSiteManager = new WebSiteManager(appHostPath);
 
+            // TODO: extract in a startup manager
             if (!webSiteManager.IsIISExpressInstalled())
             {
                 MessageBoxButton buttons = MessageBoxButton.OK;
@@ -37,6 +38,31 @@ namespace IISExpressGui.Presentation
                                             webSiteManager.IISPath);
                 MessageBox.Show(message, "Application ShutDown", buttons, icon);
                 Application.Current.Shutdown();
+            }
+            if (!webSiteManager.ApplicationHostConfigExists())
+            {
+                MessageBoxButton buttons = MessageBoxButton.YesNo;
+                MessageBoxImage icon = MessageBoxImage.Question;
+                var message = string.Format(
+@"applicationhost.config file not found in the following path:
+
+{0}
+
+The application will run an IIS Express instance.
+Such instance will create the applicationhost.config file with the default website: WebSite1.
+Once created the IIS Express instance will be stopped.
+Continue?",
+                                            appHostPath);
+                var result = MessageBox.Show(message, "Confirm Initialization", buttons, icon);
+                if (result == MessageBoxResult.Yes)
+                {
+                    IISExpress.Initialize();
+                }
+                else
+                {
+                    MessageBox.Show("Canno Start IIS Express GUI", "Application ShutDown", buttons, icon);
+                    Application.Current.Shutdown();
+                }
             }
 
             // Create the ViewModel to which the main window binds.
