@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IISExpress.cs" />
     <Compile Include="WebSite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

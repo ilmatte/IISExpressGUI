@@ -9,6 +9,7 @@ using IISExpressGui.Presentation.ViewModel;
 using System.IO;
 using System.Xml;
 using IISExpressGui.IISManagement;
+using IISExpressGui.Domain;
 
 namespace IISExpressGui.Presentation
 {
@@ -26,17 +27,14 @@ namespace IISExpressGui.Presentation
             // TODO: filesystemwatch su applicationhost.config per cambiamenti e ricaricare lista siti
             // TODO: check applicationhost.config existence
             // TODO: if not found launch iisexpress to configure default website
-            var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var applicationHostConfig = Path.Combine(documentsFolder, @"IISExpress\config\applicationhost.config");
-            var path = Path.GetFullPath(applicationHostConfig);
-            var webSiteManager = new WebSiteManager(path);
+            var webSiteManager = new WebSiteManager(IISExpress.ApplicationHostConfigDefaultPath);
 
             if (!webSiteManager.IsIISExpressInstalled())
             {
                 MessageBoxButton buttons = MessageBoxButton.OK;
                 MessageBoxImage icon = MessageBoxImage.Error;
                 var message = string.Format("IISExpress is not installed in the following path:\r\n\r\n{0}\r\n\r\nThe application cannot Start.",
-                                            webSiteManager.IISDefaultPath);
+                                            webSiteManager.IISPath);
                 MessageBox.Show(message, "Application ShutDown", buttons, icon);
                 Application.Current.Shutdown();
             }

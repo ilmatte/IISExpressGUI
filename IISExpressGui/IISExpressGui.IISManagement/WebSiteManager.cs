@@ -14,10 +14,9 @@ namespace IISExpressGui.IISManagement
 {
     public class WebSiteManager : IWebSiteManager
     {
-        string iisDefaultPath;
         string applicationHostConfigPath;
         XmlDocument applicationHostConfig = new XmlDocument();
-        Dictionary<long, Process> runningProcesses = new Dictionary<long, Process>();
+        Dictionary<long, IISExpress> runningProcesses = new Dictionary<long, IISExpress>();
 
         public WebSiteManager(string applicationHostConfigPath)
         {
@@ -27,18 +26,16 @@ namespace IISExpressGui.IISManagement
             }
             this.applicationHostConfigPath = applicationHostConfigPath;
             this.applicationHostConfig.Load(applicationHostConfigPath);            
-            string programFilesFolder = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            this.iisDefaultPath = Path.Combine(programFilesFolder, @"IIS Express\IISExpress.exe");
         }
 
-        public string IISDefaultPath
+        public string IISPath
         {
-            get { return this.iisDefaultPath; }
+            get { return IISExpress.IISDefaultPath; }
         }
 
         public bool IsIISExpressInstalled()
         {            
-            return File.Exists(this.iisDefaultPath);
+            return File.Exists(IISPath);
         }
 
         public IList<WebSite> GetAllWebSites()
@@ -155,22 +152,8 @@ namespace IISExpressGui.IISManagement
 
             if (!webSite.IsRunning)
             {
-                var programFilesFolder = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-                var startInfo = new ProcessStartInfo
-                {
-                    FileName = Path.Combine(programFilesFolder, @"IIS Express\IISExpress.exe"),
-                    Arguments = string.Format("/site:{0}", webSite.Name),
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    //WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
-                };
-
-                var process = new Process { StartInfo = startInfo };
-                this.runningProcesses[webSite.Id] = process;
-                process.Start();
+                var iisExpressInstance = IISExpress.Start(webSite);
+                this.runningProcesses[webSite.Id] = iisExpressInstance;
             }
             else
             {
@@ -180,10 +163,10 @@ namespace IISExpressGui.IISManagement
 
         private void Stop(WebSite webSite)
         {
-            var process = this.runningProcesses[webSite.Id];
-            if ((process != null) && !process.HasExited)
+            var iisExpressInstance = this.runningProcesses[webSite.Id];
+            if (iisExpressInstance != null)
             {
-                process.Kill();
+                iisExpressInstance.Stop();
             }        
         }
 
