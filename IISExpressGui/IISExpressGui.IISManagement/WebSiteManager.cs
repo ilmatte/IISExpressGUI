@@ -14,9 +14,15 @@ namespace IISExpressGui.IISManagement
 {
     public class WebSiteManager : IWebSiteManager
     {
+        #region Fields
+
         string applicationHostConfigPath;
         XmlDocument applicationHostConfig = new XmlDocument();
-        Dictionary<long, IISExpress> runningProcesses = new Dictionary<long, IISExpress>();
+        Dictionary<long, IISExpress> runningProcesses = new Dictionary<long, IISExpress>(); 
+
+        #endregion
+
+        #region Ctor
 
         public WebSiteManager(string applicationHostConfigPath)
         {
@@ -25,21 +31,28 @@ namespace IISExpressGui.IISManagement
                 throw new ArgumentNullException("applicationHostConfigPath");
             }
             this.applicationHostConfigPath = applicationHostConfigPath;
-            this.applicationHostConfig.Load(applicationHostConfigPath);            
         }
+
+        #endregion
+
+        #region Properties
 
         public string IISPath
         {
             get { return IISExpress.IISDefaultPath; }
-        }
+        } 
 
-        public bool IsIISExpressInstalled()
-        {            
-            return File.Exists(IISPath);
-        }
+        #endregion
+        
+        #region Public Methods
 
-        public IList<WebSite> GetAllWebSites()
+		public IList<WebSite> GetAllWebSites()
         {
+            if (!ApplicationHostConfigExists())
+            {
+                return new List<WebSite>();
+            }
+            this.applicationHostConfig.Load(applicationHostConfigPath);
             var sitesList = this.applicationHostConfig.SelectNodes("descendant::site");
             var webSites = new List<WebSite>();
             foreach (XmlNode site in sitesList)
@@ -88,6 +101,10 @@ namespace IISExpressGui.IISManagement
             {
                 throw new ArgumentNullException("webSite");
             }
+            if (this.applicationHostConfig == null)
+            {
+                throw new InvalidOperationException("applicationHostConfig is null");
+            }
 
             // TODO: validazione path e url
 
@@ -128,6 +145,10 @@ namespace IISExpressGui.IISManagement
             {
                 throw new ArgumentNullException("webSite");
             }
+            if (this.applicationHostConfig == null)
+            {
+                throw new InvalidOperationException("applicationHostConfig is null");
+            }
 
             if (webSite.IsRunning)
             {
@@ -152,13 +173,32 @@ namespace IISExpressGui.IISManagement
 
             if (!webSite.IsRunning)
             {
-                var iisExpressInstance = IISExpress.Start(webSite);
-                this.runningProcesses[webSite.Id] = iisExpressInstance;
+                Start(webSite);
             }
             else
             {
                 Stop(webSite);
             }
+        }
+
+        public bool IsIISExpressInstalled()
+        {
+            return File.Exists(IISPath);
+        }
+
+        public bool ApplicationHostConfigExists()
+        {
+            return File.Exists(applicationHostConfigPath);
+        }
+
+    	#endregion
+
+        #region Private Methods
+
+        private void Start(WebSite webSite)
+        {
+            var iisExpressInstance = IISExpress.Start(webSite);
+            this.runningProcesses[webSite.Id] = iisExpressInstance;
         }
 
         private void Stop(WebSite webSite)
@@ -167,26 +207,9 @@ namespace IISExpressGui.IISManagement
             if (iisExpressInstance != null)
             {
                 iisExpressInstance.Stop();
-            }        
-        }
-
-        public string GetActualPhysicalPath(WebSite webSite)
-        {
-            if (webSite.PhysicalPath == null)
-            {
-                return string.Empty;
             }
+        } 
 
-            var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var iisSitesHome = Path.Combine(documentsFolder, @"My Web Sites");
-            return webSite.PhysicalPath.Replace("%IIS_SITES_HOME%", iisSitesHome);
-        }
-        
-        public string GetEscapedPhysicalPath(string inputPhysicalPath)
-        {
-            var documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var iisSitesHome = Path.Combine(documentsFolder, @"My Web Sites");
-            return inputPhysicalPath.Replace(iisSitesHome, "%IIS_SITES_HOME%");
-        }
+        #endregion
     }
 }

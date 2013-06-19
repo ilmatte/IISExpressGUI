@@ -99,16 +99,16 @@ namespace IISExpressGui.Presentation.ViewModel
 
         public string PhysicalPath
         {
-            get { return this.webSiteManager.GetActualPhysicalPath(this.webSite); }
+            get { return IISExpress.GetActualPhysicalPath(this.webSite); }
             set
             {
                 if (value == this.webSite.PhysicalPath ||
-                    value == this.webSiteManager.GetActualPhysicalPath(this.webSite))
+                    value == IISExpress.GetActualPhysicalPath(this.webSite))
                 {
                     return;
                 }
 
-                this.webSite.PhysicalPath = this.webSiteManager.GetEscapedPhysicalPath(value);
+                this.webSite.PhysicalPath = IISExpress.GetEscapedPhysicalPath(value);
                 IsModified = true;
                 base.OnPropertyChanged("PhysicalPath");
             }
