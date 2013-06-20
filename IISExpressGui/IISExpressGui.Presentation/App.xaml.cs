@@ -25,7 +25,7 @@ namespace IISExpressGui.Presentation
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
             // TODO: modify url with link and edit button to change it to http label + 2 textboxes
-            // TODO: filesystemwatch su applicationhost.config to monitor changes and reload sites list
+            // TODO: filesystemwatch on applicationhost.config to monitor changes and reload sites list
             // TODO: check which sites are running at startup
             var appHostPath = IISExpress.ApplicationHostConfigDefaultPath;
             var webSiteManager = new WebSiteManager(appHostPath);

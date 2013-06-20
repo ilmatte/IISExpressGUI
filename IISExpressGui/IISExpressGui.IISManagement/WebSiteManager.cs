@@ -106,7 +106,7 @@ namespace IISExpressGui.IISManagement
                 throw new InvalidOperationException("applicationHostConfig is null");
             }
 
-            // TODO: validazione path e url
+            // TODO: path and url validation
 
             var xDocument = XDocument.Parse(this.applicationHostConfig.OuterXml);
             long maxId = xDocument.Root.Descendants("site")
