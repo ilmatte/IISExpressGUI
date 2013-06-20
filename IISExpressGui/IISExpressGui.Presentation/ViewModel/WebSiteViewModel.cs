@@ -190,7 +190,7 @@ namespace IISExpressGui.Presentation.ViewModel
         {
             get
             {
-                if (IsPhysicalPathValid())
+                if (IsPhysicalPathValid() && IsPortValid())
                 {
                     return true;
                 }
@@ -358,6 +358,12 @@ namespace IISExpressGui.Presentation.ViewModel
             return Directory.Exists(PhysicalPath);
         }
 
+        private bool IsPortValid()
+        {
+            int port;
+            return int.TryParse(Port, out port);
+        }
+
         #endregion
 
         #region IDataErrorInfo Members
@@ -376,6 +382,10 @@ namespace IISExpressGui.Presentation.ViewModel
                 if (propertyName == "PhysicalPath")
                 {
                     error = !IsPhysicalPathValid() ? "Not a Valid Path" : null;
+                }
+                else if (propertyName == "Port")
+                {
+                    error = !IsPortValid() ? "Port must be a number" : null;
                 }
 
                 // Dirty the commands registered with CommandManager,
