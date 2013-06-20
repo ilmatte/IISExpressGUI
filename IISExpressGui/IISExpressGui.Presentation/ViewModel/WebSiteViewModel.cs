@@ -182,7 +182,23 @@ namespace IISExpressGui.Presentation.ViewModel
                 base.OnPropertyChanged("IsModified");
             }
         }
-        
+
+        /// <summary>
+        /// Returns true if this object has no validation errors.
+        /// </summary>
+        public bool IsValid
+        {
+            get
+            {
+                if (IsPhysicalPathValid())
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
         #endregion
 
         #region Commands
@@ -285,8 +301,10 @@ namespace IISExpressGui.Presentation.ViewModel
         /// </summary>
         public void Save()
         {
-            //if (!item.IsValid)
-            //    throw new InvalidOperationException(Strings.CustomerViewModel_Exception_CannotSave);
+            if (!IsValid)
+            {
+                throw new InvalidOperationException("Cannot Save an invalid WebSite");
+            }
 
             if (IsNewWebSite)
             {
@@ -308,8 +326,7 @@ namespace IISExpressGui.Presentation.ViewModel
         /// </summary>
         bool CanSave
         {
-            // TODO: FROM HERE ismodified && isvalid
-            get { return IsModified; }
+            get { return IsModified && IsValid; }
         }
 
         /// <summary>
@@ -336,6 +353,11 @@ namespace IISExpressGui.Presentation.ViewModel
             get { return !IsNewWebSite; }
         }
 
+        private bool IsPhysicalPathValid()
+        {
+            return Directory.Exists(PhysicalPath);
+        }
+
         #endregion
 
         #region IDataErrorInfo Members
@@ -349,15 +371,11 @@ namespace IISExpressGui.Presentation.ViewModel
         {
             get
             {
-                // TODO: add validation to warn if there's no web site in the folder
+                // TODO: add validation to warn if empty folder
                 string error = null;
                 if (propertyName == "PhysicalPath")
                 {
-                    // The IsCompany property of the Customer class 
-                    // is Boolean, so it has no concept of being in
-                    // an "unselected" state.  The CustomerViewModel
-                    // class handles this mapping and validation.
-                    error = !Directory.Exists(PhysicalPath) ? "Not a Valid Path" : null;
+                    error = !IsPhysicalPathValid() ? "Not a Valid Path" : null;
                 }
 
                 // Dirty the commands registered with CommandManager,
@@ -367,7 +385,7 @@ namespace IISExpressGui.Presentation.ViewModel
                 return error;
             }
         }
-
+        
         #endregion
     }
 }
