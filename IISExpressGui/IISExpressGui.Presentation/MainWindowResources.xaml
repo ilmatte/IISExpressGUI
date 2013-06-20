@@ -159,12 +159,12 @@
     This template explains how to render the 'Configuration' content area in the main window.
     -->
     <DataTemplate x:Key="WebSiteDetailTemplate">
-        <Grid Margin="10,30">
+        <Grid Margin="10,50">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="4"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="4"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
@@ -193,11 +193,14 @@
                            Text=":" />
                 <TextBox x:Name="portTextBox" 
                          Margin="3,0,0,0"
-                         Text="{Binding Path=Port}" 
-                         VerticalAlignment="Center"
+                         Text="{Binding Path=Port, ValidatesOnDataErrors=True}" 
                          HorizontalAlignment="Left" 
+                         VerticalAlignment="Center"
                          />
             </StackPanel>
+            <ContentPresenter Grid.Row="3" Grid.Column="1"
+                      Content="{Binding ElementName=portTextBox, Path=(Validation.Errors).CurrentItem}"
+                      />
             <Label Grid.Row="4" Grid.Column="0" 
                    Content="_Path:" 
                    HorizontalAlignment="Right"
