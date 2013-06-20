@@ -206,6 +206,7 @@ namespace IISExpressGui.IISManagement
             var iisExpressInstance = this.runningProcesses[webSite.Id];
             if (iisExpressInstance != null)
             {
+                this.runningProcesses.Remove(webSite.Id);
                 iisExpressInstance.Stop();
             }
         } 
