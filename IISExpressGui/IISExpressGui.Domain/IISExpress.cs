@@ -37,22 +37,25 @@ namespace IISExpressGui.Domain
 
         public static string ApplicationHostConfigDefaultPath { get; private set; }
 
-        public static void Initialize()
+        public static bool Initialize()
         {
             var startInfo = GetProcessStartInfo();
             var process = new Process { StartInfo = startInfo };
             process.Start();
             int elapsed = 0;
+            bool timedOut = false;
             var timeout = TimeSpan.FromSeconds(10);
-            while (!File.Exists(ApplicationHostConfigDefaultPath) && (elapsed < timeout.TotalMilliseconds))
+            while (!File.Exists(ApplicationHostConfigDefaultPath) && !timedOut)
             {
                 Thread.Sleep(1000);
                 elapsed += 1000;
+                timedOut = (elapsed >= timeout.TotalMilliseconds);
             }
             if (!process.HasExited)
             {
                 process.Kill();
-            }  
+            }
+            return !timedOut;
         }
         
         public static IISExpress Start(WebSite webSite)

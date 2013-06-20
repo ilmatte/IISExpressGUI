@@ -10,6 +10,7 @@ using System.IO;
 using System.Xml;
 using IISExpressGui.IISManagement;
 using IISExpressGui.Domain;
+using IISExpressGui.Presentation.View;
 
 namespace IISExpressGui.Presentation
 {
@@ -29,6 +30,8 @@ namespace IISExpressGui.Presentation
             var appHostPath = IISExpress.ApplicationHostConfigDefaultPath;
             var webSiteManager = new WebSiteManager(appHostPath);
 
+            Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             // TODO: extract in a startup manager
             if (!webSiteManager.IsIISExpressInstalled())
             {
@@ -38,33 +41,23 @@ namespace IISExpressGui.Presentation
                                             webSiteManager.IISPath);
                 MessageBox.Show(message, "Application ShutDown", buttons, icon);
                 Application.Current.Shutdown();
+                return;
             }
             if (!webSiteManager.ApplicationHostConfigExists())
             {
-                MessageBoxButton buttons = MessageBoxButton.YesNo;
-                MessageBoxImage icon = MessageBoxImage.Question;
-                var message = string.Format(
-@"applicationhost.config file not found in the following path:
-
-{0}
-
-The application will run an IIS Express instance.
-Such instance will create the applicationhost.config file with the default website: WebSite1.
-Once created the IIS Express instance will be stopped.
-Continue?",
-                                            appHostPath);
-                var result = MessageBox.Show(message, "Confirm Initialization", buttons, icon);
-                if (result == MessageBoxResult.Yes)
+                var initViewModel = new InitializationViewModel(appHostPath);
+                var dialog = new InitializationView();
+                dialog.DataContext = initViewModel;
+                if (dialog.ShowDialog() == false)
                 {
-                    IISExpress.Initialize();
-                }
-                else
-                {
-                    MessageBox.Show("Canno Start IIS Express GUI", "Application ShutDown", buttons, icon);
+                    MessageBox.Show("Cannot Start IIS Express GUI", "Application ShutDown", MessageBoxButton.OK, MessageBoxImage.Warning);
                     Application.Current.Shutdown();
+                    return;
                 }
             }
 
+            Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+            
             // Create the ViewModel to which the main window binds.
             var viewModel = new MainWindowViewModel(webSiteManager);
             MainWindow window = new MainWindow();
