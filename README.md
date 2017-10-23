@@ -1,4 +1,4 @@
-# IISExpressGUI
+# IIS Express GUI
 
 ## Project Description
 
