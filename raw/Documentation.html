@@ -1,0 +1,37 @@
+<div class="wikidoc">
+<h2>Installation</h2>
+<p>Just Download the zip file, unzip wherever you want and run the: IISExpressGUI.exe file.</p>
+<h2>Introduction</h2>
+<p>At the moment the application works only with IISExpress installed under the default installation path: %Program Files%\IIS Express.<br>
+At the moment the application doesn't know if you start/stop a WebSite with the tray icon application, the command line or Visual Studio.</p>
+<p>At first StartUp, if the IISExpress configuration file (applicationhost.config) is not found in the default directory, you will be prompted to run an instance of IISExpress in order to create it.</p>
+<p>In fact if running IISExpress without specifying any website the following happen:</p>
+<p>- a default configuration file is created</p>
+<p>- a website folder is created (copied from IISExpress installation path) under IIS default web sites folder</p>
+<p>- the new website is configured in the freshly created applicationhost.config file</p>
+<p>If you choose: YES when prompted, IISExpressGUI will run IISExpress and then stop it once created the configuration file.</p>
+<p>IISExpressGUI will then startup showing only the default website in the left list.</p>
+<p>&nbsp;</p>
+<h2>Edit and Save</h2>
+<p>The main window will show the list of web sites already added to IISExpress configuration (say web sites previously run by Visual Studio with IISExpress).<br>
+If you select one you can edit and save your changes:<br>
+<br>
+- web site name<br>
+- port number<br>
+- the physical path of the folder containing the website<br>
+<br>
+As soon as you move your focus out of the textbox you wrote in you will get validation errors if any, otherwise the Save button will be enabled:</p>
+<p><img src="http://download-codeplex.sec.s-msft.com/Download?ProjectName=iisexpressgui&DownloadId=695299" alt="Invalid Path" width="602" height="401" style="vertical-align:baseline"><br>
+<br>
+<img title="Edited WebSite" src="http://download-codeplex.sec.s-msft.com/Download?ProjectName=iisexpressgui&DownloadId=695300" alt="Edited WebSite" width="602" height="401" style="vertical-align:baseline"></p>
+<h2>Start and Stop</h2>
+<p>If you right click on a WebSite on the left side, a context menu will pop up allowing you to start/stop the WebSite depending on its current status:<br>
+<br>
+<img title="Start WebSite" src="http://download-codeplex.sec.s-msft.com/Download?ProjectName=iisexpressgui&DownloadId=695301" alt="Start WebSite" width="602" height="401" style="vertical-align:baseline"></p>
+<h2>Create new WebSite</h2>
+<p>If you open the <strong>File</strong> Menu Item in the top left of the window and select:
+<strong>New WebSite</strong> a new WebSite will be added to the list on the left and it will be selected so that you can configure it on the right panel.<br>
+The new WebSite cannot be run until you Save it:<br>
+<br>
+<img title="New WebSite" src="http://download-codeplex.sec.s-msft.com/Download?ProjectName=iisexpressgui&DownloadId=695302" alt="New WebSite" width="602" height="401" style="vertical-align:baseline"></p>
+</div><div class="ClearBoth"></div>
