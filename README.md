@@ -24,4 +24,4 @@ The first release only supports:
 - localhost 
 
 
-See Documentation: [here](https://github.com/ilmatte/IISExpressGUI/wiki)
+See Documentation: [here](https://ilmatte.github.io/IISExpressGUI/)
