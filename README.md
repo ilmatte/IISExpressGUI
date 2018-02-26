@@ -23,7 +23,10 @@ The first release only supports:
 - Http protocol
 - localhost 
 
-
+<!--
 See Documentation: [here](https://github.com/ilmatte/IISExpressGUI/wiki)
+-->
+
+See Documentation: [here](docs/Documentation.html)
 
 
