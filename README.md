@@ -28,5 +28,5 @@ See Documentation: [here](https://github.com/ilmatte/IISExpressGUI/wiki)
 
 -->
 
-See Documentation: [here](https://github.com/ilmatte/IISExpressGUI/docs/Documentation.html)
+See Documentation: [here](docs/Documentation.html)
 
