@@ -6,7 +6,9 @@ using System.Text;
 using System.Windows.Input;
 using IISExpressGui.IISManagement.Interfaces;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
+using System.Windows;
 using Ookii.Dialogs.Wpf;
 
 namespace IISExpressGui.Presentation.ViewModel
@@ -27,6 +29,8 @@ namespace IISExpressGui.Presentation.ViewModel
         RelayCommand saveCommand;
         RelayCommand toggleStatusCommand;
         RelayCommand browseCommand;
+        RelayCommand deleteWebSiteCommand;
+        RelayCommand openBrowserCommand;
 
         #endregion
 
@@ -78,6 +82,7 @@ namespace IISExpressGui.Presentation.ViewModel
                 this.webSite.Url = value;
                 IsModified = true;
                 base.OnPropertyChanged("Url");
+                base.OnPropertyChanged("ViewUrl");
             }
         }
 
@@ -94,8 +99,11 @@ namespace IISExpressGui.Presentation.ViewModel
                 this.webSite.Port = value;
                 IsModified = true;
                 base.OnPropertyChanged("Port");
+                base.OnPropertyChanged("ViewUrl");
             }
         }
+
+        public string ViewUrl => $"{Url}:{Port}";
 
         public string PhysicalPath
         {
@@ -130,10 +138,13 @@ namespace IISExpressGui.Presentation.ViewModel
             }
         }
 
+        public long WebSiteId => webSite?.Id ?? 0;
+        public Action<WebSiteViewModel> WhenDeleted { get; set; }
+
         #endregion
 
         #region Presentation Properties
-        
+
         public override string DisplayName
         {
             get
@@ -233,6 +244,30 @@ namespace IISExpressGui.Presentation.ViewModel
             }
         }
 
+        public ICommand DeleteWebSiteCommand
+        {
+            get
+            {
+                if (this.deleteWebSiteCommand == null)
+                {
+                    this.deleteWebSiteCommand = new RelayCommand(param => DeleteWebSite());
+                }
+                return this.deleteWebSiteCommand;
+            }
+        }
+
+        public ICommand OpenBrowserCommand
+        {
+            get
+            {
+                if (this.openBrowserCommand == null)
+                {
+                    this.openBrowserCommand = new RelayCommand(param => OpenWebSite());
+                }
+                return this.openBrowserCommand;
+            }
+        }
+
         /// <summary>
         /// Returns a command that opens a dialog to browse folders.
         /// </summary>
@@ -254,14 +289,14 @@ namespace IISExpressGui.Presentation.ViewModel
 
         public static WebSiteViewModel CreateNew(IWebSiteManager webSiteManager, IMediator mediator)
         {
-            var webSite = new WebSite 
-                              {
-                                  Name = "New WebSite",
-                                  Url = "http://localhost",
-                                  Port = "8080",
-                                  IsRunning = false
-                              };
-            return new WebSiteViewModel(webSite, webSiteManager, mediator) 
+            var webSite = new WebSite
+            {
+                Name = "New WebSite",
+                Url = "http://localhost",
+                Port = "8080",
+                IsRunning = false
+            };
+            return new WebSiteViewModel(webSite, webSiteManager, mediator)
             {
                 IsNewWebSite = true,
                 IsModified = true
@@ -273,9 +308,9 @@ namespace IISExpressGui.Presentation.ViewModel
         /// </summary>
         public void Browse()
         {
-            var browseFolderDialog = new VistaFolderBrowserDialog 
+            var browseFolderDialog = new VistaFolderBrowserDialog
             {
-                    ShowNewFolderButton = true
+                ShowNewFolderButton = true
             };
             if (Directory.Exists(PhysicalPath))
             {
@@ -288,6 +323,18 @@ namespace IISExpressGui.Presentation.ViewModel
             }
         }
 
+        public void OpenWebSite()
+        {
+            try
+            {
+                Process.Start(ViewUrl);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Launch website error:{ex}");
+            }
+        }
+
         /// <summary>
         /// Returns true if the BrowseCommand can be run.
         /// </summary>
@@ -295,7 +342,7 @@ namespace IISExpressGui.Presentation.ViewModel
         {
             get { return true; }
         }
-        
+
         /// <summary>
         /// Inserts or updates the website to the repository.  This method is invoked by the SaveCommand.
         /// </summary>
@@ -314,11 +361,20 @@ namespace IISExpressGui.Presentation.ViewModel
             {
                 this.webSiteManager.Update(webSite);
             }
-                        
+
             //base.OnPropertyChanged("DisplayName");
 
             IsNewWebSite = false;
             IsModified = false;
+        }
+
+        public void DeleteWebSite()
+        {
+            if (MessageBox.Show("Are you sure to delete this website?", "confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                this.webSiteManager.Remove(webSite.Id);
+                WhenDeleted?.Invoke(this);
+            }
         }
 
         /// <summary>
@@ -395,7 +451,7 @@ namespace IISExpressGui.Presentation.ViewModel
                 return error;
             }
         }
-        
+
         #endregion
     }
 }

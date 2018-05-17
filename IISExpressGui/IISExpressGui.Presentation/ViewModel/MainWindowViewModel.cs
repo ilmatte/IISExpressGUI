@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -22,6 +23,7 @@ namespace IISExpressGui.Presentation.ViewModel
         readonly IMediator mediator;
         readonly IWebSiteManager webSiteManager;
         RelayCommand createWebSiteCommand;
+        RelayCommand clearInvalidedWebSiteCommand;
 
         #endregion 
 
@@ -36,7 +38,7 @@ namespace IISExpressGui.Presentation.ViewModel
             this.mediator = new Mediator();
             this.webSiteManager = webSiteManager;
             base.DisplayName = "IIS Express GUI";
-        } 
+        }
 
         #endregion
 
@@ -52,12 +54,16 @@ namespace IISExpressGui.Presentation.ViewModel
                 if (this.webSites == null)
                 {
                     List<WebSiteViewModel> webSiteList = LoadAvailableWebSites();
+                    foreach (var model in webSiteList)
+                    {
+                        model.WhenDeleted = site => this.webSites.Remove(site);
+                    }
                     this.webSites = new ObservableCollection<WebSiteViewModel>(webSiteList);
                 }
                 return this.webSites;
             }
         }
-        
+
         #endregion
 
         #region Commands
@@ -78,7 +84,19 @@ namespace IISExpressGui.Presentation.ViewModel
                 return this.createWebSiteCommand;
             }
         }
-        
+
+        public ICommand ClearInvalidedWebSiteCommand
+        {
+            get
+            {
+                if (this.clearInvalidedWebSiteCommand == null)
+                {
+                    this.clearInvalidedWebSiteCommand = new RelayCommand(param => ClearInvalidedWebSite());
+                }
+                return this.clearInvalidedWebSiteCommand;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -92,7 +110,7 @@ namespace IISExpressGui.Presentation.ViewModel
                            ).ToList();
             return allWebSites;
         }
-       
+
         void CreateWebSite()
         {
             var newWebSite = WebSiteViewModel.CreateNew(this.webSiteManager, this.mediator);
@@ -111,6 +129,27 @@ namespace IISExpressGui.Presentation.ViewModel
             }
         }
 
+        void ClearInvalidedWebSite()
+        {
+            var tobeRemoved = new List<WebSiteViewModel>();
+            foreach (var webSite in WebSites)
+            {
+                if (!webSite.IsValid) tobeRemoved.Add(webSite);
+            }
+            if (tobeRemoved.Count <= 0) return;
+            if (MessageBox.Show($"Are you sure to clear the invalided websites? total:{tobeRemoved.Count}"
+                    , "confirm"
+                    , MessageBoxButton.YesNo
+                    , MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                foreach (var viewModel in tobeRemoved)
+                {
+                    webSiteManager.Remove(viewModel.WebSiteId);
+                    WebSites.Remove(viewModel);
+                }
+            }
+        }
+
         #endregion
-    }    
+    }
 }

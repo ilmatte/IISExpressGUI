@@ -8,12 +8,13 @@
     <Window.Resources>
         <ResourceDictionary Source="MainWindowResources.xaml" />
     </Window.Resources>
-    
+
     <DockPanel>
         <DockPanel DockPanel.Dock="Top" KeyboardNavigation.TabNavigation="None">
             <Menu KeyboardNavigation.TabNavigation="Cycle">
                 <MenuItem Header="_File">
                     <MenuItem Header="_New WebSite" Command="{Binding Path=CreateWebSiteCommand}" />
+                    <MenuItem Header="_Clear Invalided WebSite" Command="{Binding Path=ClearInvalidedWebSiteCommand}"></MenuItem>
                     <MenuItem Header="E_xit" Command="{Binding Path=CloseCommand}" />
                 </MenuItem>
                 <!--<MenuItem Header="_Edit" />-->

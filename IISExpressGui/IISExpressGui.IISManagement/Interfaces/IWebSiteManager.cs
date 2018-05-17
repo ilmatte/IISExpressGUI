@@ -15,5 +15,7 @@ namespace IISExpressGui.IISManagement.Interfaces
         void Update(WebSite webSite);
 
         void ToggleStatus(WebSite webSite);
+
+        void Remove(long webSiteId);
     }
 }
