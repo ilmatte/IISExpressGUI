@@ -18,7 +18,7 @@ namespace IISExpressGui.IISManagement
 
         string applicationHostConfigPath;
         XmlDocument applicationHostConfig = new XmlDocument();
-        Dictionary<long, IISExpress> runningProcesses = new Dictionary<long, IISExpress>(); 
+        Dictionary<long, IISExpress> runningProcesses = new Dictionary<long, IISExpress>();
 
         #endregion
 
@@ -40,13 +40,13 @@ namespace IISExpressGui.IISManagement
         public string IISPath
         {
             get { return IISExpress.IISDefaultPath; }
-        } 
+        }
 
         #endregion
-        
+
         #region Public Methods
 
-		public IList<WebSite> GetAllWebSites()
+        public IList<WebSite> GetAllWebSites()
         {
             if (!ApplicationHostConfigExists())
             {
@@ -160,7 +160,8 @@ namespace IISExpressGui.IISManagement
             var virtualDirectoryNode = siteNode.SelectSingleNode("descendant::virtualDirectory");
             virtualDirectoryNode.Attributes["physicalPath"].Value = webSite.PhysicalPath;
             var bindingNode = siteNode.SelectSingleNode("descendant::binding");
-            bindingNode.Attributes["bindingInformation"].Value = string.Format(":{0}:localhost", webSite.Port);
+            var ip = webSite.Url.Replace("http://", "");
+            bindingNode.Attributes["bindingInformation"].Value = string.Format(":{0}:{1}", webSite.Port, ip);
             this.applicationHostConfig.Save(this.applicationHostConfigPath);
         }
 
@@ -181,6 +182,15 @@ namespace IISExpressGui.IISManagement
             }
         }
 
+        public void Remove(long webSiteId)
+        {
+            var siteByIdQuery = string.Format("descendant::site[@id='{0}']", webSiteId);
+            var siteNode = this.applicationHostConfig.SelectSingleNode(siteByIdQuery);
+            if (siteNode == null) return;
+            siteNode.ParentNode?.RemoveChild(siteNode);
+            this.applicationHostConfig.Save(this.applicationHostConfigPath);
+        }
+
         public bool IsIISExpressInstalled()
         {
             return File.Exists(IISPath);
@@ -191,7 +201,7 @@ namespace IISExpressGui.IISManagement
             return File.Exists(applicationHostConfigPath);
         }
 
-    	#endregion
+        #endregion
 
         #region Private Methods
 
@@ -209,7 +219,7 @@ namespace IISExpressGui.IISManagement
                 this.runningProcesses.Remove(webSite.Id);
                 iisExpressInstance.Stop();
             }
-        } 
+        }
 
         #endregion
     }
